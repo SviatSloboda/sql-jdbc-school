@@ -5,9 +5,10 @@ import ua.foxminded.models.Student;
 import ua.foxminded.models.createmodel.CreateStudent;
 import ua.foxminded.util.ConnectionManager;
 
+import java.util.NoSuchElementException;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.NoSuchElementException;
 import java.util.Scanner;
 
 public class JDBCRunner {
@@ -35,6 +36,7 @@ public class JDBCRunner {
             runApplicationLoop();
         } catch (SQLException e) {
             System.out.println("Error occurred: " + e.getMessage());
+            e.printStackTrace();
         }
     }
 
