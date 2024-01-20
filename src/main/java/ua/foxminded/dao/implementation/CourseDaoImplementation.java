@@ -16,7 +16,7 @@ public class CourseDaoImplementation implements CourseDao {
     private static final String COURSE_DESCRIPTION = "course_description";
     @Override
     public Course save(Course course) throws SQLException {
-        String sqlQuery = "UPDATE public.courses SET course_name = ?, course_description = ?" +
+        String sqlQuery = "UPDATE school.courses SET course_name = ?, course_description = ?" +
                 " WHERE course_id = ?";
 
         try (Connection connection = ConnectionManager.open();
@@ -36,7 +36,7 @@ public class CourseDaoImplementation implements CourseDao {
     public Course insert(CreateCourse createCourse) throws SQLException {
         Course course = new Course(-1, createCourse.getName(), createCourse.getDescription());
 
-        String sqlQuery = "INSERT INTO public.courses (course_name, course_description)" +
+        String sqlQuery = "INSERT INTO school.courses (course_name, course_description)" +
                 " VALUES (?, ?)";
 
         try (Connection connection = ConnectionManager.open();
@@ -63,7 +63,7 @@ public class CourseDaoImplementation implements CourseDao {
     @Override
     public Optional<Course> get(int id) throws SQLException {
         String sqlQuery = "SELECT course_id, course_name, course_description " +
-                "FROM public.courses " +
+                "FROM school.courses " +
                 "WHERE course_id = ?";
 
         try (Connection connection = ConnectionManager.open();
@@ -89,7 +89,7 @@ public class CourseDaoImplementation implements CourseDao {
         List<Course> courseList = new ArrayList<>();
 
         String sqlQuery = "SELECT course_id, course_name, course_description " +
-                "FROM public.courses ";
+                "FROM school.courses ";
 
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
@@ -110,7 +110,7 @@ public class CourseDaoImplementation implements CourseDao {
 
     @Override
     public Course delete(Course course) throws SQLException {
-        String sqlQuery = "DELETE FROM public.courses " +
+        String sqlQuery = "DELETE FROM school.courses " +
                 "WHERE course_id = ?";
 
         try (Connection connection = ConnectionManager.open();

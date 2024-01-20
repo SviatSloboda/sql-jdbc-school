@@ -15,7 +15,7 @@ public class StudentsToCourses {
             throw new NoSuchElementException();
         }
 
-        String sqlQuery = "INSERT INTO student_courses (student_id, course_id)" +
+        String sqlQuery = "INSERT INTO school.student_courses (student_id, course_id)" +
                 " values (?, ?)";
 
         try (Connection connection = ConnectionManager.open();
@@ -35,7 +35,7 @@ public class StudentsToCourses {
             throw new NoSuchElementException();
         }
 
-        String sqlQuery = "DELETE FROM student_courses " +
+        String sqlQuery = "DELETE FROM school.student_courses " +
                 "WHERE student_id = ? AND course_id = ?";
 
         try(Connection connection = ConnectionManager.open();

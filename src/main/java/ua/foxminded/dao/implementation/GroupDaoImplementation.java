@@ -15,7 +15,7 @@ public class GroupDaoImplementation implements GroupDao {
     private static final String GROUP_NAME = "group_name";
     @Override
     public Group save(Group group) throws SQLException {
-        String sqlQuery = "UPDATE groups set group_name = ? where" +
+        String sqlQuery = "UPDATE school.groups set group_name = ? where" +
                 " groups.group_id = ?";
 
         try (Connection connection = ConnectionManager.open();
@@ -34,7 +34,7 @@ public class GroupDaoImplementation implements GroupDao {
     public Group insert(CreateGroup createGroup) throws SQLException {
         Group group = new Group(-1, createGroup.getName());
 
-        String sqlQuery = "INSERT INTO public.groups (group_name) VALUES (?)";
+        String sqlQuery = "INSERT INTO school.groups (group_name) VALUES (?)";
 
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery, Statement.RETURN_GENERATED_KEYS)) {
@@ -59,7 +59,7 @@ public class GroupDaoImplementation implements GroupDao {
     @Override
     public Optional<Group> get(int id) throws SQLException {
         String sqlQuery = "SELECT group_id, group_name " +
-                "FROM public.groups " +
+                "FROM school.groups " +
                 "WHERE group_id = ?";
 
         try (Connection connection = ConnectionManager.open();
@@ -85,7 +85,7 @@ public class GroupDaoImplementation implements GroupDao {
         List<Group> groupList = new ArrayList<>();
 
         String sqlQuery = "SELECT group_id, group_name " +
-                "FROM public.groups ";
+                "FROM school.groups ";
 
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
@@ -104,7 +104,7 @@ public class GroupDaoImplementation implements GroupDao {
 
     @Override
     public Group delete(Group group) throws SQLException {
-        String sqlQuery = "DELETE FROM public.groups " +
+        String sqlQuery = "DELETE FROM school.groups " +
                 "WHERE group_id = ?";
 
         try (Connection connection = ConnectionManager.open();
@@ -123,8 +123,8 @@ public class GroupDaoImplementation implements GroupDao {
 
         String sqlQuery = "SELECT groups.group_id, groups.group_name," +
                 " COUNT(students.student_id) AS student_count\n" +
-                "FROM groups\n" +
-                "LEFT JOIN students ON groups.group_id = students.group_id\n" +
+                "FROM school.groups\n" +
+                "LEFT JOIN school.students ON groups.group_id = students.group_id\n" +
                 "GROUP BY groups.group_id\n" +
                 "HAVING COUNT(students.student_id) <= ?;\n";
 

@@ -5,8 +5,8 @@ import ua.foxminded.models.Student;
 import ua.foxminded.models.createmodel.CreateStudent;
 import ua.foxminded.util.ConnectionManager;
 
+import java.io.IOException;
 import java.util.NoSuchElementException;
-import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.Scanner;
@@ -37,10 +37,13 @@ public class JDBCRunner {
         } catch (SQLException e) {
             System.out.println("Error occurred: " + e.getMessage());
             e.printStackTrace();
+        } catch (IOException e) {
+            throw new RuntimeException(e);
         }
     }
 
-    private void initializeDatabase(Connection connection) throws SQLException {
+    private void initializeDatabase(Connection connection) throws SQLException, IOException {
+        TableCreation.createSchema(connection);
         TableCreation.dropTables(connection);
         TableCreation.createTables(connection);
         DataGenerator.generateGroups(connection);

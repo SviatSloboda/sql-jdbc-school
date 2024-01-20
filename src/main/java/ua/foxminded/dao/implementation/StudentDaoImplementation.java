@@ -18,7 +18,7 @@ public class StudentDaoImplementation implements StudentDao {
     private static final String STUDENT_SECOND_NAME = "last_name";
     @Override
     public Student save(Student student) throws SQLException {
-        String sqlQuery = "UPDATE public.students " + "SET group_id = ?, first_name = ?, last_name = ? " + "WHERE student_id = ?";
+        String sqlQuery = "UPDATE school.students " + "SET group_id = ?, first_name = ?, last_name = ? " + "WHERE student_id = ?";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
@@ -37,7 +37,7 @@ public class StudentDaoImplementation implements StudentDao {
     public Student insert(CreateStudent createStudent) throws SQLException {
         Student student = new Student(-1, createStudent.getGroupId(), createStudent.getFirstName(), createStudent.getSecondName());
 
-        String insertSql = "INSERT INTO public.students (group_id, first_name, last_name) VALUES (?,?,?)";
+        String insertSql = "INSERT INTO school.students (group_id, first_name, last_name) VALUES (?,?,?)";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(insertSql, Statement.RETURN_GENERATED_KEYS)) {
 
@@ -67,7 +67,7 @@ public class StudentDaoImplementation implements StudentDao {
 
     @Override
     public Student delete(Student student) throws SQLException {
-        String sqlQuery = "DELETE FROM public.students WHERE student_id = ?";
+        String sqlQuery = "DELETE FROM school.students WHERE student_id = ?";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
@@ -82,7 +82,7 @@ public class StudentDaoImplementation implements StudentDao {
 
     @Override
     public Optional<Student> get(int id) throws SQLException {
-        String sqlQuery = "SELECT student_id, group_id, first_name, last_name " + "FROM public.students " + "WHERE student_id = ?;";
+        String sqlQuery = "SELECT student_id, group_id, first_name, last_name " + "FROM school.students " + "WHERE student_id = ?;";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
@@ -108,7 +108,7 @@ public class StudentDaoImplementation implements StudentDao {
     public List<Student> getAll() throws SQLException {
         List<Student> list = new ArrayList<>();
 
-        String sqlQuery = "SELECT student_id, group_id, first_name, last_name " + "FROM public.students ";
+        String sqlQuery = "SELECT student_id, group_id, first_name, last_name " + "FROM school.students ";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
@@ -132,9 +132,9 @@ public class StudentDaoImplementation implements StudentDao {
 
         String sqlQuery = "select students.student_id, students.group_id, students.first_name,\n" +
                 "students.last_name\n" +
-                "from students\n" +
-                "inner join student_courses on students.student_id = student_courses.student_id\n" +
-                "inner join courses on student_courses.course_id = courses.course_id\n" +
+                "from school.students\n" +
+                "inner join school.student_courses on students.student_id = student_courses.student_id\n" +
+                "inner join school.courses on student_courses.course_id = courses.course_id\n" +
                 "where courses.course_name like ?";
 
         try(Connection connection = ConnectionManager.open();

@@ -51,7 +51,6 @@ public class DataGenerator {
                 "Smith", "Johnson", "Williams", "Brown", "Jones", "Garcia", "Miller", "Davis", "Rodriguez", "Martinez",
                 "Hernandez", "Lopez", "Gonzalez", "Wilson", "Anderson", "Thomas", "Taylor", "Moore", "Jackson", "Martin"
         };
-        Random random = new Random();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(sql)) {
             for (int i = 0; i < 200; i++) {
@@ -66,11 +65,10 @@ public class DataGenerator {
 
     public static void assignStudentsToGroups(Connection connection) throws SQLException {
         String updateSql = "UPDATE students SET group_id = ? WHERE student_id = ?";
-        Random random = new Random();
 
         try (PreparedStatement preparedStatement = connection.prepareStatement(updateSql)) {
             for (int studentId = 1; studentId <= 200; studentId++) {
-                int groupId = random.nextInt(10) + 1; // Assuming group IDs are from 1 to 10
+                int groupId = random.nextInt(10) + 1;
                 preparedStatement.setInt(1, groupId);
                 preparedStatement.setInt(2, studentId);
                 preparedStatement.executeUpdate();
