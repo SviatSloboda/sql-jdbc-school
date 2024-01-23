@@ -1,11 +1,15 @@
 package ua.foxminded.dao.implementation;
 
 import ua.foxminded.dao.GroupDao;
-import ua.foxminded.models.createmodel.CreateGroup;
 import ua.foxminded.models.Group;
+import ua.foxminded.models.createmodel.CreateGroup;
 import ua.foxminded.util.ConnectionManager;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -13,13 +17,14 @@ import java.util.Optional;
 public class GroupDaoImplementation implements GroupDao {
     private static final String GROUP_ID = "group_id";
     private static final String GROUP_NAME = "group_name";
+
     @Override
-    public Group save(Group group) throws SQLException {
+    public Group updateGroup(Group group) throws SQLException {
         String sqlQuery = "UPDATE school.groups set group_name = ? where" +
                 " groups.group_id = ?";
 
         try (Connection connection = ConnectionManager.open();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)){
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
             preparedStatement.setString(1, group.getName());
             preparedStatement.setInt(2, group.getId());
@@ -31,7 +36,7 @@ public class GroupDaoImplementation implements GroupDao {
     }
 
     @Override
-    public Group insert(CreateGroup createGroup) throws SQLException {
+    public Group saveGroup(CreateGroup createGroup) throws SQLException {
         Group group = new Group(-1, createGroup.getName());
 
         String sqlQuery = "INSERT INTO school.groups (group_name) VALUES (?)";
@@ -57,7 +62,7 @@ public class GroupDaoImplementation implements GroupDao {
     }
 
     @Override
-    public Optional<Group> get(int id) throws SQLException {
+    public Optional<Group> getGroup(int id) throws SQLException {
         String sqlQuery = "SELECT group_id, group_name " +
                 "FROM school.groups " +
                 "WHERE group_id = ?";
@@ -81,7 +86,7 @@ public class GroupDaoImplementation implements GroupDao {
     }
 
     @Override
-    public List<Group> getAll() throws SQLException {
+    public List<Group> getAllGroups() throws SQLException {
         List<Group> groupList = new ArrayList<>();
 
         String sqlQuery = "SELECT group_id, group_name " +
@@ -92,7 +97,7 @@ public class GroupDaoImplementation implements GroupDao {
 
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
-                    int groupID = resultSet.getInt(GROUP_NAME);
+                    int groupID = resultSet.getInt(GROUP_ID);
                     String groupName = resultSet.getString(GROUP_NAME);
                     groupList.add(new Group(groupID, groupName));
                 }
@@ -103,7 +108,7 @@ public class GroupDaoImplementation implements GroupDao {
     }
 
     @Override
-    public Group delete(Group group) throws SQLException {
+    public Group deleteGroup(Group group) throws SQLException {
         String sqlQuery = "DELETE FROM school.groups " +
                 "WHERE group_id = ?";
 
@@ -118,7 +123,7 @@ public class GroupDaoImplementation implements GroupDao {
     }
 
     @Override
-    public List<Group> findAllGroupsWithLessOrEqualStudentsNumber(int studentsNumber) throws SQLException{
+    public List<Group> findAllGroupsWithLessOrEqualStudentsNumber(int studentsNumber) throws SQLException {
         List<Group> groupList = new ArrayList<>();
 
         String sqlQuery = "SELECT groups.group_id, groups.group_name," +
@@ -128,12 +133,12 @@ public class GroupDaoImplementation implements GroupDao {
                 "GROUP BY groups.group_id\n" +
                 "HAVING COUNT(students.student_id) <= ?;\n";
 
-        try(Connection connection = ConnectionManager.open();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)){
+        try (Connection connection = ConnectionManager.open();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
             preparedStatement.setInt(1, studentsNumber);
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()){
-                while(resultSet.next()){
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
                     int groupId = resultSet.getInt(GROUP_ID);
                     String groupName = resultSet.getString(GROUP_NAME);
                     groupList.add(new Group(groupId, groupName));

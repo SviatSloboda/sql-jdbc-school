@@ -1,11 +1,15 @@
 package ua.foxminded.dao.implementation;
 
 import ua.foxminded.dao.StudentDao;
-import ua.foxminded.models.createmodel.CreateStudent;
 import ua.foxminded.models.Student;
+import ua.foxminded.models.createmodel.CreateStudent;
 import ua.foxminded.util.ConnectionManager;
 
-import java.sql.*;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.Statement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -16,8 +20,9 @@ public class StudentDaoImplementation implements StudentDao {
     private static final String STUDENT_GROUP_ID = "group_id";
     private static final String STUDENT_FIRST_NAME = "first_name";
     private static final String STUDENT_SECOND_NAME = "last_name";
+
     @Override
-    public Student save(Student student) throws SQLException {
+    public Student updateStudent(Student student) throws SQLException {
         String sqlQuery = "UPDATE school.students " + "SET group_id = ?, first_name = ?, last_name = ? " + "WHERE student_id = ?";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
@@ -33,9 +38,20 @@ public class StudentDaoImplementation implements StudentDao {
         return student;
     }
 
+    private static void validateGroupExists(int id) throws NoSuchElementException, SQLException {
+        GroupDaoImplementation groupDaoImplementation = new GroupDaoImplementation();
+        boolean exists = groupDaoImplementation.getAllGroups().stream().anyMatch(group -> group.getId() == id);
+
+        if (!exists) {
+            throw new NoSuchElementException("Group with ID " + id + " does not exist.");
+        }
+    }
+
     @Override
-    public Student insert(CreateStudent createStudent) throws SQLException {
+    public Student saveStudent(CreateStudent createStudent) throws SQLException {
         Student student = new Student(-1, createStudent.getGroupId(), createStudent.getFirstName(), createStudent.getSecondName());
+
+        validateGroupExists(student.getGroupId());
 
         String insertSql = "INSERT INTO school.students (group_id, first_name, last_name) VALUES (?,?,?)";
 
@@ -64,24 +80,31 @@ public class StudentDaoImplementation implements StudentDao {
         return student;
     }
 
-
     @Override
-    public Student delete(Student student) throws SQLException {
-        String sqlQuery = "DELETE FROM school.students WHERE student_id = ?";
+    public Student deleteStudent(Student student) throws SQLException {
+        String sqlQuery = "DELETE FROM school.student_courses WHERE student_id = ?;";
 
-        try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+        try (Connection connection = ConnectionManager.open();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
             preparedStatement.setInt(1, student.getId());
+            preparedStatement.executeUpdate();
+        }
 
+        sqlQuery = "DELETE FROM school.students WHERE student_id = ?;";
+
+        try (Connection connection = ConnectionManager.open();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
+
+            preparedStatement.setInt(1, student.getId());
             preparedStatement.executeUpdate();
         }
 
         return student;
     }
 
-
     @Override
-    public Optional<Student> get(int id) throws SQLException {
+    public Optional<Student> getStudent(int id) throws SQLException {
         String sqlQuery = "SELECT student_id, group_id, first_name, last_name " + "FROM school.students " + "WHERE student_id = ?;";
 
         try (Connection connection = ConnectionManager.open(); PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
@@ -103,9 +126,8 @@ public class StudentDaoImplementation implements StudentDao {
         return Optional.empty();
     }
 
-
     @Override
-    public List<Student> getAll() throws SQLException {
+    public List<Student> getAllStudents() throws SQLException {
         List<Student> list = new ArrayList<>();
 
         String sqlQuery = "SELECT student_id, group_id, first_name, last_name " + "FROM school.students ";
@@ -126,8 +148,18 @@ public class StudentDaoImplementation implements StudentDao {
         return list;
     }
 
+    public static void checkCourse(String courseName) throws SQLException {
+        GroupDaoImplementation groupDaoImplementation = new GroupDaoImplementation();
+        boolean courseExists = groupDaoImplementation.getAllGroups()
+                .stream().anyMatch(group -> group.getName().equals(courseName));
+
+        if (!courseExists) throw new NoSuchElementException();
+    }
+
     @Override
     public List<Student> findAllStudentsByCourse(String courseName) throws SQLException {
+        checkCourse(courseName);
+
         List<Student> students = new ArrayList<>();
 
         String sqlQuery = "select students.student_id, students.group_id, students.first_name,\n" +
@@ -137,13 +169,13 @@ public class StudentDaoImplementation implements StudentDao {
                 "inner join school.courses on student_courses.course_id = courses.course_id\n" +
                 "where courses.course_name like ?";
 
-        try(Connection connection = ConnectionManager.open();
-        PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)){
+        try (Connection connection = ConnectionManager.open();
+             PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
 
             preparedStatement.setString(1, courseName);
 
-            try (ResultSet resultSet = preparedStatement.executeQuery()){
-                while(resultSet.next()){
+            try (ResultSet resultSet = preparedStatement.executeQuery()) {
+                while (resultSet.next()) {
                     students.add(new Student(
                             resultSet.getInt(STUDENT_ID),
                             resultSet.getInt(STUDENT_GROUP_ID),
@@ -159,6 +191,7 @@ public class StudentDaoImplementation implements StudentDao {
 
     @Override
     public Student deleteStudentById(int id) throws SQLException {
-        return get(id).orElseThrow(() -> new NoSuchElementException("There is no such student!"));
+        return deleteStudent(getStudent(id)
+                .orElseThrow(() -> new NoSuchElementException("There is no such student!")));
     }
 }

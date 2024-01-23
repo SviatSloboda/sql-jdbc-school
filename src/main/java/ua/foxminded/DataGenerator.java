@@ -8,7 +8,7 @@ import java.util.Random;
 import java.util.Set;
 
 public class DataGenerator {
-    private final static Random random = new Random();
+    private static final Random random = new Random();
 
     private DataGenerator() {
     }
@@ -99,6 +99,4 @@ public class DataGenerator {
             }
         }
     }
-
-
 }

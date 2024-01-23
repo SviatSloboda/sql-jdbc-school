@@ -7,7 +7,6 @@ import java.sql.Statement;
 import java.util.Scanner;
 
 public class TableCreation {
-
     private TableCreation() {
     }
 
@@ -40,6 +39,4 @@ public class TableCreation {
             }
         }
     }
-
-
 }

@@ -5,7 +5,11 @@ import ua.foxminded.models.Course;
 import ua.foxminded.models.createmodel.CreateCourse;
 import ua.foxminded.util.ConnectionManager;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.Statement;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -14,8 +18,9 @@ public class CourseDaoImplementation implements CourseDao {
     private static final String COURSE_ID = "course_id";
     private static final String COURSE_NAME = "course_name";
     private static final String COURSE_DESCRIPTION = "course_description";
+
     @Override
-    public Course save(Course course) throws SQLException {
+    public Course updateCourse(Course course) throws SQLException {
         String sqlQuery = "UPDATE school.courses SET course_name = ?, course_description = ?" +
                 " WHERE course_id = ?";
 
@@ -33,7 +38,7 @@ public class CourseDaoImplementation implements CourseDao {
     }
 
     @Override
-    public Course insert(CreateCourse createCourse) throws SQLException {
+    public Course saveCourse(CreateCourse createCourse) throws SQLException {
         Course course = new Course(-1, createCourse.getName(), createCourse.getDescription());
 
         String sqlQuery = "INSERT INTO school.courses (course_name, course_description)" +
@@ -61,7 +66,7 @@ public class CourseDaoImplementation implements CourseDao {
     }
 
     @Override
-    public Optional<Course> get(int id) throws SQLException {
+    public Optional<Course> getCourse(int id) throws SQLException {
         String sqlQuery = "SELECT course_id, course_name, course_description " +
                 "FROM school.courses " +
                 "WHERE course_id = ?";
@@ -81,11 +86,12 @@ public class CourseDaoImplementation implements CourseDao {
                 }
             }
         }
+
         return Optional.empty();
     }
 
     @Override
-    public List<Course> getAll() throws SQLException {
+    public List<Course> getAllCourses() throws SQLException {
         List<Course> courseList = new ArrayList<>();
 
         String sqlQuery = "SELECT course_id, course_name, course_description " +
@@ -93,8 +99,6 @@ public class CourseDaoImplementation implements CourseDao {
 
         try (Connection connection = ConnectionManager.open();
              PreparedStatement preparedStatement = connection.prepareStatement(sqlQuery)) {
-
-
             try (ResultSet resultSet = preparedStatement.executeQuery()) {
                 while (resultSet.next()) {
                     int courseId = resultSet.getInt(COURSE_ID);
@@ -105,11 +109,12 @@ public class CourseDaoImplementation implements CourseDao {
                 }
             }
         }
+
         return courseList;
     }
 
     @Override
-    public Course delete(Course course) throws SQLException {
+    public Course deleteCourse(Course course) throws SQLException {
         String sqlQuery = "DELETE FROM school.courses " +
                 "WHERE course_id = ?";
 
@@ -119,6 +124,7 @@ public class CourseDaoImplementation implements CourseDao {
             preparedStatement.setInt(1, course.getId());
             preparedStatement.executeUpdate();
         }
+
         return course;
     }
 }

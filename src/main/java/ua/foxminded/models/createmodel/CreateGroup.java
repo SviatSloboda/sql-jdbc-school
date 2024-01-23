@@ -1,10 +1,8 @@
 package ua.foxminded.models.createmodel;
 
-import lombok.AllArgsConstructor;
-import lombok.Data;
+import lombok.Getter;
 
-@Data
-@AllArgsConstructor
+@Getter
 public class CreateGroup {
     private String name;
 }
