@@ -1,3 +1,3 @@
 # sql-jdbc-school
 
-Simple JDBC School Application for practise.
+A simple JDBC school application designed for practice.
